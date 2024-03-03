@@ -21,11 +21,17 @@ tz = datetime.timezone(offset, name='МСК')
 
 @dp.chat_join_request_handler()
 async def chat_join_request(update: types.ChatJoinRequest):
-    db.add_user(update.from_user.id)
-    await bot.send_message(chat_id=update.from_user.id, text=approve_message, parse_mode=types.ParseMode.HTML)
+    if not db.get_user_by_user_id(update.from_user.id):
+        db.add_user(update.from_user.id)
+        await bot.send_message(chat_id=update.from_user.id, text=approve_message, parse_mode=types.ParseMode.HTML)
 
-    await asyncio.sleep(15)
-    await update.approve()
+        await asyncio.sleep(15)
+        await update.approve()
+    else:
+        await bot.send_message(chat_id=update.from_user.id, text=approve_message, parse_mode=types.ParseMode.HTML)
+
+        await asyncio.sleep(15)
+        await update.approve()
 
 
 @dp.message_handler(commands=['link_create'])
